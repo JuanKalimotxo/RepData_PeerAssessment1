@@ -2,13 +2,15 @@
 
 ### Settings
 
-```{r echo=TRUE}
+
+```r
 echo = TRUE # Enables others to read the code
 ```
 
 ### Loading and preprocessing the data
 
-```{r echo=TRUE}
+
+```r
 data <- read.csv("activity.csv")
 ```
 
@@ -23,27 +25,53 @@ It is required to:
 
 3. Calculate and report the mean and median of the total number of steps taken per day
 
-```{r echo=TRUE}
+
+```r
 library(ggplot2)
 totalSteps <- tapply(data$steps, data$date, FUN = sum, na.rm = TRUE)
 qplot(totalSteps, binwidth = 1000, xlab = "Total number of steps taken daily")
+```
+
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+
+```r
 mean(totalSteps, na.rm = TRUE)
+```
+
+```
+## [1] 9354.23
+```
+
+```r
 median(totalSteps, na.rm = TRUE)
+```
+
+```
+## [1] 10395
 ```
 
 ### What is the average daily activity pattern?
 
 A time series plot is required outlining the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis).
 
-```{r echo=TRUE}
+
+```r
 averageSteps <- aggregate(x = list(steps = data$steps), by = list(interval = data$interval), FUN = mean, na.rm = TRUE)
 ggplot(data = averageSteps, aes(x = interval, y = steps)) + geom_line() + ggtitle("Time Series Plot of the 5-minute Interval") + xlab("5-minute Interval") + ylab("Average Number of Steps Taken")
 ```
 
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
+
 It is required to find out which 5-minute interval across all the days in the dataset contains the maximum number of steps.
 
-```{r echo=TRUE}
+
+```r
 averageSteps[which.max(averageSteps$steps), ]
+```
+
+```
+##     interval    steps
+## 104      835 206.1698
 ```
 
 ### Imputing missing values
@@ -60,9 +88,19 @@ It is required to:
 
 4. Make a histogram of the total number of steps taken each day and calculate and report the **mean** and **median** total number of steps taken per day
 
-```{r echo=TRUE}
+
+```r
 missingValues <- is.na(data$steps)
 table(missingValues)
+```
+
+```
+## missingValues
+## FALSE  TRUE 
+## 15264  2304
+```
+
+```r
 fillValue <- function(steps, interval) {
         filled <- NA
         if(!is.na(steps))
@@ -75,8 +113,24 @@ filledData <- data
 filledData$steps <- mapply(fillValue, filledData$steps, filledData$interval)
 totalSteps <- tapply(filledData$steps, filledData$date, FUN = sum)
 qplot(totalSteps, binwidth = 1000, xlab = "Total Number of Steps Taken Each Day")
+```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png)
+
+```r
 mean(totalSteps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(totalSteps)
+```
+
+```
+## [1] 10766.19
 ```
 
 ### Are there any differences in activity patterns between weekdays and weekends?
@@ -87,7 +141,8 @@ It is required to:
 
 2. Make a panel plot containing a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis)
 
-```{r echo=TRUE}
+
+```r
 weekdayOrWeekend <- function(date) {
         day <- weekdays(date)
         if (day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday"))
@@ -104,3 +159,5 @@ ggplot(averageSteps, aes(interval, steps)) + geom_line() + facet_grid(day ~ .) +
         ggtitle("Time Series Plot of the 5-minute Interval Weekdays/Weekends Average") +
         xlab("5-minute Interval") + ylab("Number of Steps")
 ```
+
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
